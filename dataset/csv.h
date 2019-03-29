@@ -29,6 +29,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #ifndef CSV_H
 #define CSV_H
 
@@ -75,7 +77,7 @@ namespace io {
 
 			void set_file_name(const char*file_name) {
 				if (file_name != nullptr) {
-					strncpy(this->file_name, file_name, sizeof(this->file_name));
+					strncpy_s(this->file_name, file_name, sizeof(this->file_name));
 					this->file_name[sizeof(this->file_name) - 1] = '\0';
 				}
 				else {
@@ -424,7 +426,7 @@ namespace io {
 
 		void set_file_name(const char*file_name) {
 			if (file_name != nullptr) {
-				strncpy(this->file_name, file_name, sizeof(this->file_name));
+				strncpy_s(this->file_name, file_name, sizeof(this->file_name));
 				this->file_name[sizeof(this->file_name) - 1] = '\0';
 			}
 			else {
@@ -511,7 +513,7 @@ namespace io {
 
 			void set_column_name(const char*column_name) {
 				if (column_name != nullptr) {
-					std::strncpy(this->column_name, column_name, max_column_name_length);
+					strncpy_s(this->column_name, column_name, max_column_name_length);
 					this->column_name[max_column_name_length] = '\0';
 				}
 				else {
@@ -532,7 +534,7 @@ namespace io {
 
 			void set_column_content(const char*column_content) {
 				if (column_content != nullptr) {
-					std::strncpy(this->column_content, column_content, max_column_content_length);
+					strncpy_s(this->column_content, column_content, max_column_content_length);
 					this->column_content[max_column_content_length] = '\0';
 				}
 				else {

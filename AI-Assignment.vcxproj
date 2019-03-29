@@ -23,7 +23,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dataset\DataReader.cpp" />
-    <ClCompile Include="dataset\fast-cpp-test.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="matrix.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dataset\csv.h" />
