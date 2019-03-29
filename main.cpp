@@ -1,4 +1,4 @@
-#include "dataset/csv.h"
+#include "csv.h"
 #include "matrix.h"
 
 #include <iostream>

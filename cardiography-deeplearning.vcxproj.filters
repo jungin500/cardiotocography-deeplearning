@@ -15,21 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="dataset\CTG.csv" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="dataset\DataReader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="matrix.h">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dataset\csv.h">
+    <ClInclude Include="csv.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
