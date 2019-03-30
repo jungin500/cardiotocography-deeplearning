@@ -1,10 +1,12 @@
+#pragma once
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 
 using namespace std;
 
-namespace matrix {
+namespace Cardiography {
 
 	struct Size {
 		int rows;
@@ -75,16 +77,13 @@ namespace matrix {
 			if (another.row != col)
 				throw new std::exception("Matrix multiplication failure: Invalid multipliction");
 
-			print();
-			print(another);
-
 			Matrix<T> result(row, another.col);
 			for (int j = 0; j < row; j++)
 				for (int i = 0; i < another.col; i++) {
 					T resultItem = 0.;
 					
 					for (int this_cols = 0; this_cols < col; this_cols++)
-						resultItem += item[i][this_cols] * another.item[this_cols][j];
+						resultItem += item[j][this_cols] * another.item[this_cols][i];
 							
 					result.item[j][i] = resultItem; // TODO: Check accessor failure of template6
 				}
