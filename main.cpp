@@ -6,10 +6,9 @@
 #include <ctime>
 
 using namespace std;
-
 using namespace Cardiography;
 
-/*
+/* 
 int main() {
 	CSVReader reader("dataset/cardiography-dataset.csv");
 	in.read_header(io::ignore_extra_column, "LB", "AC", "FM", "UC",
@@ -28,11 +27,6 @@ int main() {
 }
 */
 
-int main() {
-	CSVReader reader("dataset/cardiography-dataset.csv");
-	cout << reader.readLine() << endl;
-}
-
 void printArr(double *arr[], int rows, int cols) {
 	for (int j = 0; j < rows; j++) {
 		for (int i = 0; i < cols; i++) {
@@ -42,4 +36,9 @@ void printArr(double *arr[], int rows, int cols) {
 		}
 		cout << "\n";
 	}
+}
+
+int main() {
+	CSVReader reader("dataset/cardiography-dataset.csv");
+	cout << reader.nextLine() << endl;
 }
