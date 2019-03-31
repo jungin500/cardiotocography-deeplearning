@@ -9,6 +9,10 @@
 
 namespace Cardiography {
 
+	double sigmoid(double input) {
+		return 1 / (1 + exp(-input));
+	}
+
 	template <typename T = double *>
 	class TrainData {
 	public:
@@ -21,9 +25,6 @@ namespace Cardiography {
 
 	class DataFactory {
 	private:
-		vector<TrainData<double *>> fulldata;
-		vector<int> train_index, test_index;
-		int trainidx_ptr, testidx_ptr;
 
 	public:
 		DataFactory() {}
@@ -55,6 +56,9 @@ namespace Cardiography {
 		}
 
 #pragma endregion
+		vector<TrainData<double *>> fulldata;
+		vector<int> train_index, test_index;
+		int trainidx_ptr, testidx_ptr;
 
 		/// train_ratio between 0.0 and 1.0
 		void randomizeDataset(const double &train_ratio) {
@@ -112,7 +116,7 @@ namespace Cardiography {
 			print();
 		}
 
-		Matrix<double> *forward(const Matrix<double> *data) {
+		Matrix<double> forwardAll(const Matrix<double> *data) {
 			Matrix<double> result(*data);
 
 			for (int i = 0; i < weightMatrix.size(); i++) {
@@ -120,7 +124,12 @@ namespace Cardiography {
 				result = result * weights; // repeated `size()`th
 			}
 
-			return &result;
+			return result;
+		}
+
+		Matrix<double> forward(const Matrix<double> *data, const int &index) {
+			Matrix<double> original(*data);
+			return original * (*weightMatrix.at(index));
 		}
 
 		void print() {
@@ -160,8 +169,18 @@ int main() {
 	network = new SimpleFNN(21, new int[1]{ 10 }, 1, 3);
 
 	double *data[1] = { datafactory.nextTest().data };
-	Matrix<double> *test_data = new Matrix<double>(1, 21, data);
-	Matrix<double> *result_data = network->forward(test_data);
 
-	result_data->print();
+	Matrix<double> *test_data = new Matrix<double>(1, 21, data);
+	cout << "Test Data:" << endl;
+	test_data->print();
+	
+	Matrix<double> forward0 = network->forward(test_data, 0);
+	cout << "Forward0:" << endl;
+	forward0.print();
+	forward0.each(sigmoid);
+
+	Matrix<double> forward1 = network->forward(&forward0, 1);
+	forward1.each(sigmoid);
+	cout << "Forward1:" << endl;
+	forward1.print();
 }

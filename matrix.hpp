@@ -49,11 +49,20 @@ namespace Cardiography {
 
 		void fillRandomNumber() {
 			srand((unsigned int)time(NULL));
-			int delim = rand();
+			int delim, sign;
+			double val;
 
 			for (int j = 0; j < row; j++) {
-				for (int i = 0; i < col; i++)
-					item[j][i] = (rand() % 2 - 1) * (rand() % delim) / delim / 20;
+				for (int i = 0; i < col; i++) {
+					delim = rand();
+
+					if (delim != 0) {
+						sign = (rand() % 2 - 1);
+						val = (double)(rand() % delim) / delim / 20.0;
+						item[j][i] = sign * val;
+					} else
+						item[j][i] = 0.0;
+				}
 			}
 		}
 
@@ -61,6 +70,12 @@ namespace Cardiography {
 			assert(0 <= row && row < this->row);
 			assert(0 <= col && col < this->col);
 			return item[col][row];
+		}
+
+		void each(double (*fp)(double)) {
+			for (int i = 0; i < row; i++)
+				for (int j = 0; j < col; j++)
+					item[i][j] = fp(item[i][j]);
 		}
 
 		void set(int col, int row, T data) {
@@ -90,9 +105,10 @@ namespace Cardiography {
 					
 					for (int this_cols = 0; this_cols < col; this_cols++)
 						resultItem += item[j][this_cols] * another.item[this_cols][i];
-							
+
 					result.item[j][i] = resultItem; // TODO: Check accessor failure of template6
 				}
+
 			return result;
 		}
 

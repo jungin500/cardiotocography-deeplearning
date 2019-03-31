@@ -97,7 +97,8 @@ namespace Cardiography {
 				lineno++; colno = 0;
 
 				return true;
-			} else
+			}
+			else
 				return false;
 		}
 
