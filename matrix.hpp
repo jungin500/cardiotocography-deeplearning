@@ -27,6 +27,7 @@ namespace Cardiography {
 			item = new T*[row];
 			for (int i = 0; i < row; i++)
 				item[i] = new T[col];
+			fillRandomNumber();
 		}
 
 		Matrix(int row, int col, T *data[]) : Matrix(row, col) {
@@ -35,9 +36,14 @@ namespace Cardiography {
 		}
 
 		Matrix(const Matrix<T> &another) {
-			item = another.item;
 			row = another.row;
 			col = another.col;
+			item = new T*[row];
+			for (int i = 0; i < row; i++) {
+				item[i] = new T[col];
+				for (int j = 0; j < col; j++)
+					item[i][j] = another.item[i][j];
+			}
 		}
 
 
@@ -47,7 +53,7 @@ namespace Cardiography {
 
 			for (int j = 0; j < row; j++) {
 				for (int i = 0; i < col; i++)
-					item[j][i] = (rand() % delim) / delim / 20;
+					item[j][i] = (rand() % 2 - 1) * (rand() % delim) / delim / 20;
 			}
 		}
 
