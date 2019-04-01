@@ -179,8 +179,8 @@ int main() {
 	forward0.print();
 	forward0.each(sigmoid);
 
-	Matrix<double> forward1 = network->forward(&forward0, 1);
-	forward1.each(sigmoid);
+	Matrix<double> result = network->forward(&forward0, 1);
+	result.each(sigmoid);
 	cout << "Forward1:" << endl;
-	forward1.print();
+	result.print();
 }
