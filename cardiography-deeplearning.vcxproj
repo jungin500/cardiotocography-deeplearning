@@ -152,9 +152,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SimpleFNN.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csv.hpp" />
+    <ClInclude Include="DataFactory.hpp" />
     <ClInclude Include="matrix.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
