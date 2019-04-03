@@ -42,21 +42,26 @@ int main() {
 	// Create network and Feed-Forward data
 	network = new SimpleFNN(21, new int[1]{ 10 }, 1, 3);
 
-	for(int i = 0; i < datafactory.testSize(); i++)
+	for (int i = 0; i < datafactory.testSize(); i++)
+	{
+		if (!datafactory.hasNextTest())
+			break;
 
-	double *data[1] = { datafactory.nextTest().data };
+		double *data[1] = { datafactory.nextTest().data };
 
-	Matrix<double> *test_data = new Matrix<double>(1, 21, data);
-	cout << "Test Data:" << endl;
-	test_data->print();
-	
-	Matrix<double> forward0 = network->forward(test_data, 0);
-	cout << "Forward0:" << endl;
-	forward0.print();
-	forward0.each(sigmoid);
+		Matrix<double> *test_data = new Matrix<double>(1, 21, data);
+		cout << "Test Data:" << endl;
+		test_data->print();
 
-	Matrix<double> result = network->forward(&forward0, 1);
-	result.each(sigmoid);
-	cout << "Forward1:" << endl;
-	result.print();
+		Matrix<double> forward0 = network->forward(test_data, 0);
+		cout << "Forward0:" << endl;
+		forward0.print();
+		forward0.each(sigmoid);
+
+		Matrix<double> result = network->forward(&forward0, 1);
+		result.each(sigmoid);
+		cout << "Forward1:" << endl;
+		result.print();
+	}
+
 }

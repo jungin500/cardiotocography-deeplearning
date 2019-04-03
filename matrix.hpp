@@ -60,7 +60,8 @@ namespace Cardiography {
 						sign = (rand() % 2 - 1);
 						val = (double)(rand() % delim) / delim / 20.0;
 						item[j][i] = sign * val;
-					} else
+					}
+					else
 						item[j][i] = 0.0;
 				}
 			}
@@ -72,7 +73,7 @@ namespace Cardiography {
 			return item[col][row];
 		}
 
-		void each(double (*fp)(double)) {
+		void each(double(*fp)(double)) {
 			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
 					item[i][j] = fp(item[i][j]);
@@ -90,8 +91,10 @@ namespace Cardiography {
 			return sz;
 		}
 
-		void set(Matrix<T> a, Matrix<T> b) {
-			a = b;
+		void replaceItem(int col, int row, T **data) {
+			this->data = data;
+			this->col = col;
+			this->row = row;
 		}
 
 		Matrix<T> operator* (const Matrix<T> &another) {
@@ -102,7 +105,7 @@ namespace Cardiography {
 			for (int j = 0; j < row; j++)
 				for (int i = 0; i < another.col; i++) {
 					T resultItem = 0.;
-					
+
 					for (int this_cols = 0; this_cols < col; this_cols++)
 						resultItem += item[j][this_cols] * another.item[this_cols][i];
 
