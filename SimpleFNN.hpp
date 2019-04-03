@@ -41,6 +41,7 @@ namespace Cardiography {
 
 		Matrix<double> forward(const Matrix<double> *data, const int &index) {
 			Matrix<double> original(*data);
+
 			return original * (*weightMatrix.at(index));
 		}
 

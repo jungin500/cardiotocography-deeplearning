@@ -50,18 +50,18 @@ int main() {
 		double *data[1] = { datafactory.nextTest().data };
 
 		Matrix<double> *test_data = new Matrix<double>(1, 21, data);
-		cout << "Test Data:" << endl;
-		test_data->print();
+		//cout << "Test Data:" << endl;
+		//test_data->print();
 
 		Matrix<double> forward0 = network->forward(test_data, 0);
-		cout << "Forward0:" << endl;
-		forward0.print();
+		//cout << "Forward0:" << endl;
+		//forward0.print();
 		forward0.each(sigmoid);
 
 		Matrix<double> result = network->forward(&forward0, 1);
-		result.each(sigmoid);
-		cout << "Forward1:" << endl;
 		result.print();
+
+
 	}
 
 }

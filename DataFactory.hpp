@@ -26,7 +26,10 @@ namespace Cardiography {
 		int trainidx_ptr, testidx_ptr;
 
 	public:
-		DataFactory() {}
+		DataFactory() {
+			trainidx_ptr = 0;
+			testidx_ptr = 0;
+		}
 
 		void add(const TrainData<double *> &data) {
 			fulldata.push_back(data);
@@ -59,6 +62,8 @@ namespace Cardiography {
 		TrainData<double *> nextTest() {
 			if (!hasNextTest())
 				throw new exception("EndOfTestDatasetException");
+
+			cout << testidx_ptr << endl;
 			return fulldata.at(test_index.at(testidx_ptr++));
 		}
 
