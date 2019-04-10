@@ -72,6 +72,11 @@ namespace Cardiography {
 			}
 		}
 
+		T at(int row, int col) {
+			// assert(row < this->row && col < this->col)
+			return item[row][col];
+		}
+
 		void each(double(*fp)(double)) {
 			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
@@ -122,7 +127,7 @@ namespace Cardiography {
 			print(*this);
 		}
 
-#pragma region Mathematical Calculator
+#pragma region Mathematical Calculation
 		Matrix<T> squaredError(const Matrix<T> *correct_one_hot) {
 			// assert(correct_one_hot->row == 1 && row == 1 && correct_one_hot->col == col);
 
@@ -131,6 +136,14 @@ namespace Cardiography {
 				error.item[0][i] = pow(correct_one_hot->item[0][i] - item[0][i], 2);
 
 			return error;
+		}
+
+		Matrix<T> transpose() {
+			Matrix<T> transposeMatrix(col, row);
+			for (int i = 0; i < row; i++)
+				for (int j = 0; j < col; j++)
+					transposeMatrix.item[j][i] = item[i][j];
+			return transposeMatrix;
 		}
 #pragma endregion
 	};

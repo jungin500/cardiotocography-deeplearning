@@ -1,3 +1,4 @@
+#include "math.hpp"
 #include "csv.hpp"
 #include "matrix.hpp"
 #include "SimpleFNN.hpp"
@@ -54,8 +55,7 @@ int main() {
 		Matrix<double> result = network->forward(&forward0, 1);
 		Matrix<double> sqError = result.squaredError(correct_one_hot);
 
-		sqError.print();
-
+		
 	}
 
 }

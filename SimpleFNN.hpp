@@ -1,21 +1,16 @@
+#pragma once
+
+#include "math.hpp"
 #include "matrix.hpp"
 
 #include <iostream>
 #include <vector>
 
+#define LEARNING_RATE 12
+
 namespace Cardiography {
 
 	using namespace std;
-
-	// Sigmoid
-	double sigmoid(double input) {
-		return 1 / (1 + exp(-input));
-	}
-
-	// Derivate of Sigmoid
-	double dsigmoid(double input) {
-		return (1 - input) * input;
-	}
 
 	class SimpleFNN {
 	private:
@@ -62,12 +57,29 @@ namespace Cardiography {
 			dsgSqError.each(dsigmoid);
 
 			// 이전 값을 저장할 중간 레이어
-			vector<Matrix<double>*> layerValues;
+			vector<Matrix<double>*> backpropLayers;
 			for (int i = 0; i < weightMatrix.size(); i++)
-				layerValues.push_back(new Matrix<double>(1, weightMatrix.at(i)->size().cols));
+				backpropLayers.push_back(new Matrix<double>(1, weightMatrix.at(i)->size().cols));
 
 			// 마지막에서 Backpropagation
-			
+			for (int i = weightMatrix.size() - 1; i >= 0; i--) {
+				Matrix<double>* currentWeight = weightMatrix.at(i);
+
+				Matrix<double>* currentBackpropLayer = backpropLayers.at(backpropLayers.size() - 1); // 마지막 레이어를 가져온다. 출력층 바로 앞.
+				for (int k = 0; k < 3; k++)
+					for (int j = 0; j < currentWeight->size().cols; j++) {
+						double w_sum = .0;
+
+						for (int i = 0; i < currentWeight->size().rows; i++)
+							w_sum += currentWeight->at(i, k); // 0은 현재 y_[1]번 Backpropagation이기 때문!
+
+						double divide = currentWeight->at(j, k) / w_sum; // 0,0 => 0 x_[1]번 Backpropagation이며 y_[1]번이기 때문
+						currentBackpropLayer->set(k, 0, divide * LEARNING_RATE);
+					}
+
+				cout << "BackpropLayer" << endl;
+				currentBackpropLayer->print();
+			}
 		}
 
 		void print() {
