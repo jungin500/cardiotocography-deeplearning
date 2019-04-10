@@ -3,11 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cardiotocography-deeplearning", "cardiotocography-deeplearning.vcxproj", "{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Debug|x64.ActiveCfg = Debug|x64
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Debug|x64.Build.0 = Debug|x64
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Debug|x86.ActiveCfg = Debug|Win32
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Debug|x86.Build.0 = Debug|Win32
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Release|x64.ActiveCfg = Release|x64
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Release|x64.Build.0 = Release|x64
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Release|x86.ActiveCfg = Release|Win32
+		{A561CDEC-07F0-48A7-9FE9-4AFB5F660BCB}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {98861021-B29A-4654-8834-5FB55A651F8C}
+		SolutionGuid = {5569DD24-1A68-412E-A956-D5F1E27DD25D}
 	EndGlobalSection
 EndGlobal
