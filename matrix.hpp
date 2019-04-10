@@ -132,7 +132,6 @@ namespace Cardiography {
 
 			return error;
 		}
-
 #pragma endregion
 	};
 }

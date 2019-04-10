@@ -9,19 +9,6 @@
 #include <vector>
 #include <assert.h>
 
-namespace Cardiography {
-
-	// Sigmoid
-	double sigmoid(double input) {
-		return 1 / (1 + exp(-input));
-	}
-
-	// Derivate of Sigmoid
-	double dsigmoid(double input) {
-		return (1 - input) * input;
-	}
-}
-
 using namespace std;
 using namespace Cardiography;
 
@@ -46,7 +33,7 @@ int main() {
 	datafactory.randomizeDataset(0.8);
 
 	// Create network and Feed-Forward data
-	network = new SimpleFNN(21, new int[1]{ 10 }, 1, 3);
+	network = new SimpleFNN(21, new int[1]{ 100 }, 1, 3);
 
 	for (int i = 0; i < datafactory.testSize(); i++)
 	{

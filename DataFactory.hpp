@@ -11,11 +11,10 @@ namespace Cardiography {
 
 	class TrainData {
 	public:
-		int dataType;
-		double *data;
+		double* data;
 		int label;
 
-		TrainData(double *dataset, int label) : label(label) {
+		TrainData(double* dataset, int label) : label(label) {
 			data = new double[21];
 			for (int i = 0; i < 21; i++)
 				data[i] = dataset[i];
@@ -34,7 +33,7 @@ namespace Cardiography {
 			testidx_ptr = 0;
 		}
 
-		void add(const TrainData &data) {
+		void add(const TrainData& data) {
 			fulldata.push_back(data);
 		}
 
@@ -71,7 +70,7 @@ namespace Cardiography {
 #pragma endregion
 
 		/// train_ratio between 0.0 and 1.0
-		void randomizeDataset(const double &train_ratio) {
+		void randomizeDataset(const double& train_ratio) {
 			if (!(0.0 <= train_ratio && train_ratio <= 1.0))
 				throw new exception("InvalidTrainRatioException");
 

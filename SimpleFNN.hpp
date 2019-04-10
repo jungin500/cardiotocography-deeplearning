@@ -7,15 +7,25 @@ namespace Cardiography {
 
 	using namespace std;
 
+	// Sigmoid
+	double sigmoid(double input) {
+		return 1 / (1 + exp(-input));
+	}
+
+	// Derivate of Sigmoid
+	double dsigmoid(double input) {
+		return (1 - input) * input;
+	}
+
 	class SimpleFNN {
 	private:
 		int inputLayerDims;
 		int outputLayerDims;
-		vector<Matrix<double> *> weightMatrix;
+		vector<Matrix<double>*> weightMatrix;
 
 	public:
-		SimpleFNN(const int &input_layer, const int *hidden_layer,
-			const int &hidden_layer_size, const int &output_layer)
+		SimpleFNN(const int& input_layer, const int* hidden_layer,
+			const int& hidden_layer_size, const int& output_layer)
 			: inputLayerDims(input_layer), outputLayerDims(output_layer) {
 
 			weightMatrix.push_back(new Matrix<double>(inputLayerDims, hidden_layer[0]));
@@ -28,7 +38,7 @@ namespace Cardiography {
 			print();
 		}
 
-		Matrix<double> forwardAll(const Matrix<double> *data) {
+		Matrix<double> forwardAll(const Matrix<double> * data) {
 			Matrix<double> result(*data);
 
 			for (int i = 0; i < weightMatrix.size(); i++) {
@@ -39,9 +49,25 @@ namespace Cardiography {
 			return result;
 		}
 
-		Matrix<double> forward(const Matrix<double> *data, const int &index) {
+		Matrix<double> forward(const Matrix<double> * data, const int& index) {
 			Matrix<double> original(*data);
 			return original * (*weightMatrix.at(index));
+		}
+
+		void backward(const Matrix<double> * sqError) {
+			// assert(sqError->size().rows == 1 && sqError->size().cols == 3);
+
+			// 미분된 Sigmoid(dSigmoid)를 적용한 Error result
+			Matrix<double> dsgSqError(*sqError);
+			dsgSqError.each(dsigmoid);
+
+			// 이전 값을 저장할 중간 레이어
+			vector<Matrix<double>*> layerValues;
+			for (int i = 0; i < weightMatrix.size(); i++)
+				layerValues.push_back(new Matrix<double>(1, weightMatrix.at(i)->size().cols));
+
+			// 마지막에서 Backpropagation
+			
 		}
 
 		void print() {
