@@ -10,8 +10,15 @@
 #include <assert.h>
 
 namespace Cardiography {
+
+	// Sigmoid
 	double sigmoid(double input) {
 		return 1 / (1 + exp(-input));
+	}
+
+	// Derivate of Sigmoid
+	double dsigmoid(double input) {
+		return (1 - input) * input;
 	}
 }
 
@@ -24,15 +31,14 @@ SimpleFNN *network;
 
 int main() {
 	// Read whole data
+	int label;
+	double dataset[21];
 	while (reader.nextLine()) {
-		double dataset[21];
-		int label;
-
 		for (int i = 0; i < 21; i++)
 			dataset[i] = reader.next<double>();
 		label = reader.next<int>();
 
-		TrainData<double *> data(dataset, label);
+		TrainData data(dataset, label);
 		datafactory.add(data);
 	}
 
@@ -47,21 +53,22 @@ int main() {
 		if (!datafactory.hasNextTest())
 			break;
 
-		double *data[1] = { datafactory.nextTest().data };
+		TrainData train = datafactory.nextTest();
+		double *data[1] = { train.data };
+		double *correct[1] = { new double[3] { .0, .0, .0 } };
+		correct[0][train.label - 1] = 1.0;
 
+		Matrix<double> *correct_one_hot = new Matrix<double>(1, 3, correct);
 		Matrix<double> *test_data = new Matrix<double>(1, 21, data);
-		cout << "Test Data:" << endl;
-		test_data->print();
 
 		Matrix<double> forward0 = network->forward(test_data, 0);
-		cout << "Forward0:" << endl;
-		forward0.print();
 		forward0.each(sigmoid);
 
 		Matrix<double> result = network->forward(&forward0, 1);
-		result.each(sigmoid);
-		cout << "Forward1:" << endl;
-		result.print();
+		Matrix<double> sqError = result.squaredError(correct_one_hot);
+
+		sqError.print();
+
 	}
 
 }

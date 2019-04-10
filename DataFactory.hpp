@@ -9,26 +9,32 @@ namespace Cardiography {
 
 	using namespace std;
 
-	template <typename T = double *>
 	class TrainData {
 	public:
 		int dataType;
-		T data;
+		double *data;
 		int label;
 
-		TrainData(T data, int label) : data(data), label(label) {}
+		TrainData(double *dataset, int label) : label(label) {
+			data = new double[21];
+			for (int i = 0; i < 21; i++)
+				data[i] = dataset[i];
+		}
 	};
 
 	class DataFactory {
 	private:
-		vector<TrainData<double *>> fulldata;
+		vector<TrainData> fulldata;
 		vector<int> train_index, test_index;
 		int trainidx_ptr, testidx_ptr;
 
 	public:
-		DataFactory() {}
+		DataFactory() {
+			trainidx_ptr = 0;
+			testidx_ptr = 0;
+		}
 
-		void add(const TrainData<double *> &data) {
+		void add(const TrainData &data) {
 			fulldata.push_back(data);
 		}
 
@@ -50,13 +56,13 @@ namespace Cardiography {
 			return test_index.size();
 		}
 
-		TrainData<double *> nextTrain() {
+		TrainData nextTrain() {
 			if (!hasNextTrain())
 				throw new exception("EndOfTrainDatasetException");
 			return fulldata.at(train_index.at(trainidx_ptr++));
 		}
 
-		TrainData<double *> nextTest() {
+		TrainData nextTest() {
 			if (!hasNextTest())
 				throw new exception("EndOfTestDatasetException");
 			return fulldata.at(test_index.at(testidx_ptr++));

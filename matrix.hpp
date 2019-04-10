@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cassert>
 
 using namespace std;
 
@@ -32,7 +33,12 @@ namespace Cardiography {
 
 		Matrix(int row, int col, T *data[]) : Matrix(row, col) {
 			// assert(sizeof(data) == sizeof(T) * row);
-			item = data;
+			item = new T*[row];
+			for (int i = 0; i < row; i++) {
+				item[i] = new T[col];
+				for (int j = 0; j < col; j++)
+					item[i][j] = data[i][j];
+			}
 		}
 
 		Matrix(const Matrix<T> &another) {
@@ -45,7 +51,6 @@ namespace Cardiography {
 					item[i][j] = another.item[i][j];
 			}
 		}
-
 
 		void fillRandomNumber() {
 			srand((unsigned int)time(NULL));
@@ -67,21 +72,14 @@ namespace Cardiography {
 			}
 		}
 
-		T at(int col, int row) {
-			assert(0 <= row && row < this->row);
-			assert(0 <= col && col < this->col);
-			return item[col][row];
-		}
-
 		void each(double(*fp)(double)) {
 			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
 					item[i][j] = fp(item[i][j]);
 		}
 
-		void set(int col, int row, T data) {
-			at(col, row);
-			item[col][row] = data;
+		void set(int row, int col, T data) {
+			item[row][col] = data;
 		}
 
 		Size size() {
@@ -89,12 +87,6 @@ namespace Cardiography {
 			sz.rows = row;
 			sz.cols = col;
 			return sz;
-		}
-
-		void replaceItem(int col, int row, T **data) {
-			this->data = data;
-			this->col = col;
-			this->row = row;
 		}
 
 		Matrix<T> operator* (const Matrix<T> &another) {
@@ -129,5 +121,18 @@ namespace Cardiography {
 		void print() {
 			print(*this);
 		}
+
+#pragma region Mathematical Calculator
+		Matrix<T> squaredError(const Matrix<T> *correct_one_hot) {
+			// assert(correct_one_hot->row == 1 && row == 1 && correct_one_hot->col == col);
+
+			Matrix<T> error(1, col);
+			for (int i = 0; i < col; i++)
+				error.item[0][i] = pow(correct_one_hot->item[0][i] - item[0][i], 2);
+
+			return error;
+		}
+
+#pragma endregion
 	};
 }
