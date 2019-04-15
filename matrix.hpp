@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace Cardiography {
+namespace Cardiotocography {
 
 	struct Size {
 		int rows;
@@ -17,7 +17,7 @@ namespace Cardiography {
 	template<typename T = double>
 	class Matrix {
 	private:
-		T **item;
+		T** item;
 		int row;
 		int col;
 
@@ -25,26 +25,29 @@ namespace Cardiography {
 
 		// Constructor
 		Matrix(int row, int col) : row(row), col(col) {
-			item = new T*[row];
+			item = new T * [row];
 			for (int i = 0; i < row; i++)
 				item[i] = new T[col];
 			fillRandomNumber();
 		}
 
-		Matrix(int row, int col, T *data[]) : Matrix(row, col) {
+		Matrix(int row, int col, T * data[]) : Matrix(row, col) {
 			// assert(sizeof(data) == sizeof(T) * row);
-			item = new T*[row];
-			for (int i = 0; i < row; i++) {
-				item[i] = new T[col];
+			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
 					item[i][j] = data[i][j];
-			}
 		}
 
-		Matrix(const Matrix<T> &another) {
+		~Matrix() {
+			for (int i = 0; i < row; i++)
+				delete[] item[i];
+			delete[] item;
+		}
+
+		Matrix(const Matrix<T> & another) {
 			row = another.row;
 			col = another.col;
-			item = new T*[row];
+			item = new T * [row];
 			for (int i = 0; i < row; i++) {
 				item[i] = new T[col];
 				for (int j = 0; j < col; j++)
@@ -94,7 +97,7 @@ namespace Cardiography {
 			return sz;
 		}
 
-		Matrix<T> operator* (const Matrix<T> &another) {
+		Matrix<T> operator* (const Matrix<T> & another) {
 			if (another.row != col)
 				throw new std::exception("Matrix multiplication failure: Invalid multipliction");
 
@@ -112,7 +115,7 @@ namespace Cardiography {
 			return result;
 		}
 
-		void print(const Matrix<T> &mat) {
+		void print(const Matrix<T> & mat) {
 			for (int j = 0; j < mat.row; j++) {
 				for (int i = 0; i < mat.col; i++) {
 					cout << mat.item[j][i];
@@ -128,12 +131,20 @@ namespace Cardiography {
 		}
 
 #pragma region Mathematical Calculation
-		Matrix<T> squaredError(const Matrix<T> *correct_one_hot) {
+		Matrix<T>* squaredError(const Matrix<T> * correct_one_hot) {
 			// assert(correct_one_hot->row == 1 && row == 1 && correct_one_hot->col == col);
 
-			Matrix<T> error(1, col);
+			Matrix<T>* error = new Matrix<T>(1, col);
 			for (int i = 0; i < col; i++)
 				error.item[0][i] = pow(correct_one_hot->item[0][i] - item[0][i], 2);
+
+			return error;
+		}
+
+		Matrix<T>* differenceError(const Matrix<T> * correct_one_hot) {
+			Matrix<T>* error = new Matrix<T>(1, col);
+			for (int i = 0; i < col; i++)
+				error->item[0][i] = correct_one_hot->item[0][i] - item[0][i];
 
 			return error;
 		}
@@ -144,6 +155,46 @@ namespace Cardiography {
 				for (int j = 0; j < col; j++)
 					transposeMatrix.item[j][i] = item[i][j];
 			return transposeMatrix;
+		}
+
+		// Mean squared Error. Suppose row == 1 and col == 3?
+		double mse(const Matrix<T> * correct_one_hot) {
+			double mse = 0;
+			for (int i = 0; i < col; i++)
+				mse += pow(item[0][i] - correct_one_hot->item[0][i], 2) / 2;
+			return mse;
+		}
+
+		double max() {
+			double maxValue = item[0][0];
+			for (int i = 0; i < row; i++)
+				for (int j = 0; j < col; j++)
+					maxValue = std::max(maxValue, item[i][j]);
+			return maxValue;
+		}
+
+		int maxIndexAsOneHot() {
+			double maxValue = item[0][0]; int maxIndex = 0;
+			for (int j = 0; j < col; j++) {
+				maxValue = std::max(maxValue, item[0][j]);
+				if (maxValue == item[0][j])
+					maxIndex = j;
+			}
+			return maxIndex;
+		}
+#pragma endregion
+
+#pragma region Static Mathematical Calculation
+
+		// Returns negative of each elements
+		static Matrix<T>* neg(const Matrix<T> * original) {
+			Matrix<T>* negMat = new Matrix<T>(original->row, original->col);
+
+			for (int i = 0; i < original->row; i++)
+				for (int j = 0; j < original->col; j++)
+					negMat->item[i][j] = -(original->item[i][j]);
+
+			return negMat;
 		}
 #pragma endregion
 	};

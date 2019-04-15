@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace Cardiography {
+namespace Cardiotocography {
 
 	using namespace std;
 
@@ -13,6 +13,6 @@ namespace Cardiography {
 
 	// Derivate of Sigmoid
 	double dsigmoid(double input) {
-		return (1 - input) * input;
+		return (1 - sigmoid(input)) * sigmoid(input);
 	}
 }

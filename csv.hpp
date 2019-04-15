@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace Cardiography {
+namespace Cardiotocography {
 
 	const string header_name[22] = { "LB", "AC", "FM", "UC",
 		"DL", "DS", "DP", "ASTV", "MSTV", "ALTV", "MLTV", "Width",

@@ -5,19 +5,22 @@
 #include <Vector>
 #include <ctime>
 
-namespace Cardiography {
+namespace Cardiotocography {
 
 	using namespace std;
 
 	class TrainData {
 	public:
-		double* data;
-		int label;
+		Matrix<double> *data;
+		Matrix<double> *correct_one_hot;
 
-		TrainData(double* dataset, int label) : label(label) {
-			data = new double[21];
-			for (int i = 0; i < 21; i++)
-				data[i] = dataset[i];
+		// length(dataset) == 21, total_set_of(label) == 3
+		TrainData(double* dataset, int label) {
+			double** dataset_dynamic = new double* [1]{ dataset };
+			double** label_dynamic = new double* [1]{ new double[3] {0.0, 0.0, 0.0} };
+			
+			data = new Matrix<double>(1, 21, dataset_dynamic);
+			correct_one_hot = new Matrix<double>(1, 3, label_dynamic);
 		}
 	};
 
@@ -53,6 +56,14 @@ namespace Cardiography {
 
 		int testSize() {
 			return test_index.size();
+		}
+
+		void resetTrainPtr() {
+			trainidx_ptr = 0;
+		}
+
+		void resetTestPtr() {
+			testidx_ptr = 0;
 		}
 
 		TrainData nextTrain() {
