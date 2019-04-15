@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-constexpr auto LEARNING_RATE = 12;
+double __learning_rate = 1.0;
 
 namespace Cardiotocography {
 
@@ -15,10 +15,10 @@ namespace Cardiotocography {
 
 	class SimpleFNN {
 	private:
-		int inputLayerDims;
-		int outputLayerDims;
-		vector<Matrix<double>*> weightMatrixes;
-		vector<Matrix<double>*> hiddenInstanceMatrixes;
+		int _inputLayerDims;
+		int _outputLayerDims;
+		vector<Matrix<double>*> _weightMatrixes;
+		vector<Matrix<double>*> _hiddenInstanceMatrixes;
 
 #pragma region Static Mathmatical Functions
 		// Get backpropagation weight update value(delta)
@@ -33,11 +33,11 @@ namespace Cardiotocography {
 			}
 
 			double upstreamHiddenValue = upstreamHidden->at(0, upstreamIndex);
-			return error * dsigmoid(sum) * upstreamHiddenValue;
+			return error * dsigmoid(sum)* upstreamHiddenValue;
 		}
 
 		// Get next upstream node's value
-		static double getBPNextNodeValue(const int& upstreamIndex, Matrix<double> * weightMatrix, Matrix<double> * downstreamHidden) {
+		static double getBPNextNodeValue(const int& upstreamIndex, Matrix<double>* weightMatrix, Matrix<double>* downstreamHidden) {
 			double nextNodeVal = .0;
 			int weightMatrixColumnCount = weightMatrix->size().cols;
 			for (int j = 0; j < weightMatrixColumnCount; j++) {
@@ -58,46 +58,49 @@ namespace Cardiotocography {
 
 	public:
 		SimpleFNN(const int& input_layer, const int* hidden_layer,
-			const int& hidden_layer_size, const int& output_layer)
-			: inputLayerDims(input_layer), outputLayerDims(output_layer) {
+			const int& hidden_layer_size, const int& output_layer, const double& learning_rate)
+			: _inputLayerDims(input_layer), _outputLayerDims(output_layer) {
 
-			weightMatrixes.push_back(new Matrix<double>(inputLayerDims, hidden_layer[0]));
+			// set as global variable
+			__learning_rate = learning_rate;
+
+			_weightMatrixes.push_back(new Matrix<double>(_inputLayerDims, hidden_layer[0]));
 
 			for (int i = 1; i < hidden_layer_size; i++)
-				weightMatrixes.push_back(new Matrix<double>(hidden_layer[i - 1], hidden_layer[i]));
+				_weightMatrixes.push_back(new Matrix<double>(hidden_layer[i - 1], hidden_layer[i]));
 
-			weightMatrixes.push_back(new Matrix<double>(hidden_layer[hidden_layer_size - 1], outputLayerDims));
+			_weightMatrixes.push_back(new Matrix<double>(hidden_layer[hidden_layer_size - 1], _outputLayerDims));
 
 			print();
 			cout << "SimpleFNN Initialized..." << endl << endl;
 		}
 
 		// test_data를 forward해서 Result를 반환한다.
-		Matrix<double>* forward(const TrainData* test_data) {
+		Matrix<double> * forward(const TrainData * test_data) {
 			Matrix<double> data(*(test_data->data)), * result, * hidden = nullptr;
-			
+
 			// Remove all instance matrixes before start
-			while (!hiddenInstanceMatrixes.empty()) {
-				Matrix<double>* hidden = hiddenInstanceMatrixes.at(hiddenInstanceMatrixes.size() - 1);
-				hiddenInstanceMatrixes.pop_back();
+			while (!_hiddenInstanceMatrixes.empty()) {
+				Matrix<double>* hidden = _hiddenInstanceMatrixes.at(_hiddenInstanceMatrixes.size() - 1);
+				_hiddenInstanceMatrixes.pop_back();
 				delete hidden;
 			}
 
-			for (int i = 0; i < weightMatrixes.size(); i++) {
+			for (int i = 0; i < _weightMatrixes.size(); i++) {
 				// hiddenMatrix의 크기는 중간 weightMatrix의 Column 수로 예측한다
 
 				if (i == 0)
-					hidden = new Matrix<double>(data * (*weightMatrixes.at(i)));
+					hidden = new Matrix<double>(data * (*_weightMatrixes.at(i)));
 				else
-					hidden = new Matrix<double>((*hiddenInstanceMatrixes.at(i - 1)) * (*weightMatrixes.at(i)));
+					hidden = new Matrix<double>((*_hiddenInstanceMatrixes.at(i - 1)) * (*_weightMatrixes.at(i)));
 
 				// Sigmoid for each function (including last one == output)
 				hidden->each(sigmoid);
 
 				// 마지막 hiddenMatrix == 출력 Matrix
-				if (i != weightMatrixes.size() - 1)
+				if (i != _weightMatrixes.size() - 1)
 					// for Backpropagation calculation
-					hiddenInstanceMatrixes.push_back(hidden);
+					_hiddenInstanceMatrixes.push_back(hidden);
 			}
 
 			if (hidden == nullptr)
@@ -115,25 +118,25 @@ namespace Cardiotocography {
 
 			// (Error) * (Sigmoid`) * (Previous Output)
 			// from End to 2nd hidden layers
-			Matrix<double>* hiddenInstanceMatrixZero = hiddenInstanceMatrixes.at(0);
+			Matrix<double>* hiddenInstanceMatrixZero = _hiddenInstanceMatrixes.at(0);
 
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < _weightMatrixes.at(0)->size().cols; i++) {
 				for (int j = 0; j < 3; j++) {
-					double delta = getBPWeightUpdateDelta(i, j, error->at(0, j), weightMatrixes.at(1), hiddenInstanceMatrixZero, error); // last matrix is 100*3
-					updateBPWeight(i, j, delta, LEARNING_RATE, weightMatrixes.at(1));
+					double delta = getBPWeightUpdateDelta(i, j, error->at(0, j), _weightMatrixes.at(1), hiddenInstanceMatrixZero, error); // last matrix is 100*3
+					updateBPWeight(i, j, delta, __learning_rate, _weightMatrixes.at(1));
 				}
 
-				double bpNodeVal = getBPNextNodeValue(i, weightMatrixes.at(1), result);
-				hiddenInstanceMatrixes.at(0)->set(0, i, bpNodeVal); // last hidden Matrix is 0
+				double bpNodeVal = getBPNextNodeValue(i, _weightMatrixes.at(1), result);
+				_hiddenInstanceMatrixes.at(0)->set(0, i, bpNodeVal); // last hidden Matrix is 0
 			}
 
 			return result->mse(one_hot_label);
 		}
 
 		void print() {
-			for (int i = 0; i < weightMatrixes.size(); i++)
-				cout << weightMatrixes.at(i)->size().rows << "x" << weightMatrixes.at(i)->size().cols << "\t";
-			cout << "Weight Matrix with Layer(" << weightMatrixes.size() << ")" << endl;
+			for (int i = 0; i < _weightMatrixes.size(); i++)
+				cout << _weightMatrixes.at(i)->size().rows << "x" << _weightMatrixes.at(i)->size().cols << "\t";
+			cout << "Weight Matrix with Layer(" << _weightMatrixes.size() << ")" << endl;
 		}
 
 	};

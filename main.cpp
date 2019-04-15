@@ -13,79 +13,86 @@
 using namespace std;
 using namespace Cardiotocography;
 
-CSVReader reader("dataset/cardiography-dataset.csv");
-DataFactory datafactory;
-SimpleFNN* network;
+CSVReader __reader("dataset/cardiography-dataset.csv");
+DataFactory __datafactory;
+
+SimpleFNN* __networkBig;
+SimpleFNN* __networkNarrow;
+SimpleFNN* __networkSmall;
 
 int main() {
 	// Read whole data
 	int label;
 	double dataset[21];
-	while (reader.nextLine()) {
+	while (__reader.nextLine()) {
 		for (int i = 0; i < 21; i++)
-			dataset[i] = reader.next<double>();
-		label = reader.next<int>();
+			dataset[i] = __reader.next<double>();
+		label = __reader.next<int>();
 
 		TrainData data(dataset, label);
-		datafactory.add(data);
+		__datafactory.add(data);
 	}
 
 	// Randomize data
-	datafactory.randomizeDataset(0.8);
+	__datafactory.randomizeDataset(0.8);
 
 	// Create network and Backpropagate data
-	int hiddenLayerNeruonCount = 100;
-	network = new SimpleFNN(21, new int[1]{ hiddenLayerNeruonCount }, 1, 3);
+	int hiddenNeuronCnt1 = 100, hiddenNeuronCnt2 = 20;
+	__networkBig = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt1 }, 1, 3, 12.0);
+	__networkNarrow = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt1 }, 1, 3, 3.0);
+	__networkSmall = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt2 }, 1, 3, 12.0);
 
 	// one epoch
-	double mseEpoch = .0;
-	datafactory.resetTestPtr();
+	double mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+	__datafactory.resetTestPtr();
 
-	for (int i = 0; i < datafactory.testSize(); i++)
+	for (int i = 0; i < __datafactory.testSize(); i++)
 	{
-		if (!datafactory.hasNextTest())
+		if (!__datafactory.hasNextTest())
 			break;
-		TrainData test = datafactory.nextTest();
-		mseEpoch += network->backward(&test);
+		TrainData test = __datafactory.nextTest();
+
+		mseEpochBig += __networkBig->backward(&test);
+		mseEpochNarrow += __networkNarrow->backward(&test);
+		mseEpochSmall += __networkSmall->backward(&test);
 	}
-	printf_s("BeginTest MSE:\t\t%.8f\n\n", mseEpoch);
+	printf_s("\t\t__networkBig(%d:%.1f)\t\t__networkNarrow(%d:%.1f)\t__networkNarrow(%d:%.1f)\n", hiddenNeuronCnt1, 12.0, hiddenNeuronCnt1, 3.0, hiddenNeuronCnt2, 12.0);
+	printf_s("BeginTest MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
 
-	// Train
-	for (int j = 0; j < 100; j++) {
-		mseEpoch = .0;
-		datafactory.resetTrainPtr();
+	// 50 epoch
+	for (int j = 0; j < 50; j++) {
 
-		for (int i = 0; i < datafactory.trainSize(); i++)
+		printf_s("[Epoch %02d]\t__networkBig(%d:%.1f)\t\t__networkNarrow(%d:%.1f)\t__networkNarrow(%d:%.1f)\n", j, hiddenNeuronCnt1, 12.0, hiddenNeuronCnt1, 3.0, hiddenNeuronCnt2, 12.0);
+		// Train each
+		mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+		__datafactory.resetTrainPtr();
+
+		for (int i = 0; i < __datafactory.trainSize(); i++)
 		{
-			if (!datafactory.hasNextTrain())
+			if (!__datafactory.hasNextTrain())
 				break;
-			TrainData train = datafactory.nextTrain();
+			TrainData train = __datafactory.nextTrain();
 
-			/*
-			// 일단 한번 돌려본다.
-			Matrix<double>* error = network->forward(&train);
-			double mse1 = error->mse(train.correct_one_hot);
-
-			cout << "First try MSE: " << mse1 << endl;
-			*/
-
-			// backward를 한번 진행해본다.
-			mseEpoch += network->backward(&train);
+			mseEpochBig += __networkBig->backward(&train);
+			mseEpochNarrow += __networkBig->backward(&train);
+			mseEpochSmall += __networkBig->backward(&train);
 		}
-
-		printf_s("TrainEpoch %03d MSE:\t%.8f\n", j + 1, mseEpoch);
+		printf_s("Train MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
 
 		// Test each
-		mseEpoch = .0;
-		datafactory.resetTestPtr();
+		mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+		__datafactory.resetTestPtr();
 
-		for (int i = 0; i < datafactory.testSize(); i++)
+		for (int i = 0; i < __datafactory.testSize(); i++)
 		{
-			if (!datafactory.hasNextTest())
+			if (!__datafactory.hasNextTest())
 				break;
-			TrainData test = datafactory.nextTest();
-			mseEpoch += network->backward(&test);
+			TrainData test = __datafactory.nextTest();
+
+			mseEpochBig += __networkBig->backward(&test);
+			mseEpochNarrow += __networkNarrow->backward(&test);
+			mseEpochSmall += __networkSmall->backward(&test);
 		}
-		printf_s("TestEpoch %03d MSE:\t%.8f\n\n", j + 1, mseEpoch);
+		printf_s("Test MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
 	}
 }

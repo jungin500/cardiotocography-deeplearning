@@ -17,17 +17,17 @@ namespace Cardiotocography {
 	template<typename T = double>
 	class Matrix {
 	private:
-		T** item;
-		int row;
-		int col;
+		T** _item;
+		int _row;
+		int _col;
 
 	public:
 
 		// Constructor
-		Matrix(int row, int col) : row(row), col(col) {
-			item = new T * [row];
+		Matrix(int row, int col) : _row(row), _col(col) {
+			_item = new T * [row];
 			for (int i = 0; i < row; i++)
-				item[i] = new T[col];
+				_item[i] = new T[col];
 			fillRandomNumber();
 		}
 
@@ -35,23 +35,23 @@ namespace Cardiotocography {
 			// assert(sizeof(data) == sizeof(T) * row);
 			for (int i = 0; i < row; i++)
 				for (int j = 0; j < col; j++)
-					item[i][j] = data[i][j];
+					_item[i][j] = data[i][j];
 		}
 
 		~Matrix() {
-			for (int i = 0; i < row; i++)
-				delete[] item[i];
-			delete[] item;
+			for (int i = 0; i < _row; i++)
+				delete[] _item[i];
+			delete[] _item;
 		}
 
 		Matrix(const Matrix<T> & another) {
-			row = another.row;
-			col = another.col;
-			item = new T * [row];
-			for (int i = 0; i < row; i++) {
-				item[i] = new T[col];
-				for (int j = 0; j < col; j++)
-					item[i][j] = another.item[i][j];
+			_row = another._row;
+			_col = another._col;
+			_item = new T * [_row];
+			for (int i = 0; i < _row; i++) {
+				_item[i] = new T[_col];
+				for (int j = 0; j < _col; j++)
+					_item[i][j] = another._item[i][j];
 			}
 		}
 
@@ -60,66 +60,66 @@ namespace Cardiotocography {
 			int delim, sign;
 			double val;
 
-			for (int j = 0; j < row; j++) {
-				for (int i = 0; i < col; i++) {
+			for (int j = 0; j < _row; j++) {
+				for (int i = 0; i < _col; i++) {
 					delim = rand();
 
 					if (delim != 0) {
 						sign = (rand() % 2 - 1);
 						val = (double)(rand() % delim) / delim / 20.0;
-						item[j][i] = sign * val;
+						_item[j][i] = sign * val;
 					}
 					else
-						item[j][i] = 0.0;
+						_item[j][i] = 0.0;
 				}
 			}
 		}
 
 		T at(int row, int col) {
 			// assert(row < this->row && col < this->col)
-			return item[row][col];
+			return _item[row][col];
 		}
 
 		void each(double(*fp)(double)) {
-			for (int i = 0; i < row; i++)
-				for (int j = 0; j < col; j++)
-					item[i][j] = fp(item[i][j]);
+			for (int i = 0; i < _row; i++)
+				for (int j = 0; j < _col; j++)
+					_item[i][j] = fp(_item[i][j]);
 		}
 
 		void set(int row, int col, T data) {
-			item[row][col] = data;
+			_item[row][col] = data;
 		}
 
 		Size size() {
 			Size sz;
-			sz.rows = row;
-			sz.cols = col;
+			sz.rows = _row;
+			sz.cols = _col;
 			return sz;
 		}
 
 		Matrix<T> operator* (const Matrix<T> & another) {
-			if (another.row != col)
+			if (another._row != _col)
 				throw new std::exception("Matrix multiplication failure: Invalid multipliction");
 
-			Matrix<T> result(row, another.col);
-			for (int j = 0; j < row; j++)
-				for (int i = 0; i < another.col; i++) {
+			Matrix<T> result(_row, another._col);
+			for (int j = 0; j < _row; j++)
+				for (int i = 0; i < another._col; i++) {
 					T resultItem = 0.;
 
-					for (int this_cols = 0; this_cols < col; this_cols++)
-						resultItem += item[j][this_cols] * another.item[this_cols][i];
+					for (int this_cols = 0; this_cols < _col; this_cols++)
+						resultItem += _item[j][this_cols] * another._item[this_cols][i];
 
-					result.item[j][i] = resultItem; // TODO: Check accessor failure of template6
+					result._item[j][i] = resultItem; // TODO: Check accessor failure of template6
 				}
 
 			return result;
 		}
 
 		void print(const Matrix<T> & mat) {
-			for (int j = 0; j < mat.row; j++) {
-				for (int i = 0; i < mat.col; i++) {
-					cout << mat.item[j][i];
-					if (i != mat.col - 1)
+			for (int j = 0; j < mat._row; j++) {
+				for (int i = 0; i < mat._col; i++) {
+					cout << mat._item[j][i];
+					if (i != mat._col - 1)
 						cout << ",\t";
 				}
 				cout << "\n";
@@ -134,50 +134,50 @@ namespace Cardiotocography {
 		Matrix<T>* squaredError(const Matrix<T> * correct_one_hot) {
 			// assert(correct_one_hot->row == 1 && row == 1 && correct_one_hot->col == col);
 
-			Matrix<T>* error = new Matrix<T>(1, col);
-			for (int i = 0; i < col; i++)
-				error.item[0][i] = pow(correct_one_hot->item[0][i] - item[0][i], 2);
+			Matrix<T>* error = new Matrix<T>(1, _col);
+			for (int i = 0; i < _col; i++)
+				error.item[0][i] = pow(correct_one_hot->_item[0][i] - _item[0][i], 2);
 
 			return error;
 		}
 
 		Matrix<T>* differenceError(const Matrix<T> * correct_one_hot) {
-			Matrix<T>* error = new Matrix<T>(1, col);
-			for (int i = 0; i < col; i++)
-				error->item[0][i] = correct_one_hot->item[0][i] - item[0][i];
+			Matrix<T>* error = new Matrix<T>(1, _col);
+			for (int i = 0; i < _col; i++)
+				error->_item[0][i] = correct_one_hot->_item[0][i] - _item[0][i];
 
 			return error;
 		}
 
 		Matrix<T> transpose() {
-			Matrix<T> transposeMatrix(col, row);
-			for (int i = 0; i < row; i++)
-				for (int j = 0; j < col; j++)
-					transposeMatrix.item[j][i] = item[i][j];
+			Matrix<T> transposeMatrix(_col, _row);
+			for (int i = 0; i < _row; i++)
+				for (int j = 0; j < _col; j++)
+					transposeMatrix._item[j][i] = _item[i][j];
 			return transposeMatrix;
 		}
 
 		// Mean squared Error. Suppose row == 1 and col == 3?
 		double mse(const Matrix<T> * correct_one_hot) {
 			double mse = 0;
-			for (int i = 0; i < col; i++)
-				mse += pow(item[0][i] - correct_one_hot->item[0][i], 2) / 2;
+			for (int i = 0; i < _col; i++)
+				mse += pow(_item[0][i] - correct_one_hot->_item[0][i], 2) / 2;
 			return mse;
 		}
 
 		double max() {
-			double maxValue = item[0][0];
-			for (int i = 0; i < row; i++)
-				for (int j = 0; j < col; j++)
-					maxValue = std::max(maxValue, item[i][j]);
+			double maxValue = _item[0][0];
+			for (int i = 0; i < _row; i++)
+				for (int j = 0; j < _col; j++)
+					maxValue = std::max(maxValue, _item[i][j]);
 			return maxValue;
 		}
 
 		int maxIndexAsOneHot() {
-			double maxValue = item[0][0]; int maxIndex = 0;
-			for (int j = 0; j < col; j++) {
-				maxValue = std::max(maxValue, item[0][j]);
-				if (maxValue == item[0][j])
+			double maxValue = _item[0][0]; int maxIndex = 0;
+			for (int j = 0; j < _col; j++) {
+				maxValue = std::max(maxValue, _item[0][j]);
+				if (maxValue == _item[0][j])
 					maxIndex = j;
 			}
 			return maxIndex;
@@ -188,11 +188,11 @@ namespace Cardiotocography {
 
 		// Returns negative of each elements
 		static Matrix<T>* neg(const Matrix<T> * original) {
-			Matrix<T>* negMat = new Matrix<T>(original->row, original->col);
+			Matrix<T>* negMat = new Matrix<T>(original->_row, original->_col);
 
-			for (int i = 0; i < original->row; i++)
-				for (int j = 0; j < original->col; j++)
-					negMat->item[i][j] = -(original->item[i][j]);
+			for (int i = 0; i < original->_row; i++)
+				for (int j = 0; j < original->_col; j++)
+					negMat->_item[i][j] = -(original->_item[i][j]);
 
 			return negMat;
 		}
