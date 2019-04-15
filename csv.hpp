@@ -15,16 +15,41 @@ namespace Cardiotocography {
 		"Min", "Max", "Nmax", "Nzeros", "Mode", "Mean", "Median",
 		"Variance", "Tendency", "NSP" };
 
+	class CSVWriter {
+	private:
+		ofstream fout;
+		string* buf;
+
+	public:
+		bool open(const string& filename) {
+			fout.open(filename, ios::out | ios::trunc);
+
+			if (!fout.is_open())
+				return false;
+			return true;
+		}
+
+		void write(const string& data, const int &size) {
+			fout.write(data.data(), size);
+			fout.flush();
+		}
+
+		void close() {
+			fout.flush();
+			fout.close();
+		}
+	};
+
 	class CSVReader {
 	private:
 		ifstream fin;
 		int lineno, colno;
 		string header;
 		string rawbuf; // Raw line buffer
-		string *buf; // Dynamic splited line buffer
+		string* buf; // Dynamic splited line buffer
 
 	public:
-		CSVReader(const string &filename) {
+		CSVReader(const string& filename) {
 			open(filename);
 			buf = nullptr;
 			if (fin.is_open()) {
@@ -42,7 +67,7 @@ namespace Cardiotocography {
 			buf = nullptr;
 		}
 
-		void open(const string &filename) {
+		void open(const string& filename) {
 			if (fin.is_open()) {
 				delete[] buf;
 				fin.close();
@@ -114,7 +139,7 @@ namespace Cardiotocography {
 				throw new exception("TemplateFormNotSupportedException");
 		}
 
-		string* currentLine() {
+		string * currentLine() {
 			string* line = new string[22]; // Copy array itself
 			memcpy(line, buf, 22 * sizeof(string));
 			return line;

@@ -5,6 +5,8 @@
 #include "DataFactory.hpp"
 
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <cstdlib>
 #include <ctime>
 #include <vector>
@@ -13,14 +15,19 @@
 using namespace std;
 using namespace Cardiotocography;
 
+const string __outputFilename = "dataset/backpropagation-report-unitcount.csv";
+
 CSVReader __reader("dataset/cardiography-dataset.csv");
+CSVWriter __writer;
 DataFactory __datafactory;
 
-SimpleFNN* __networkBig;
-SimpleFNN* __networkNarrow;
+SimpleFNN* __testNetwork1;
+SimpleFNN* __testNetwork2;
 SimpleFNN* __networkSmall;
 
 int main() {
+	__writer.open(__outputFilename);
+
 	// Read whole data
 	int label;
 	double dataset[21];
@@ -37,13 +44,13 @@ int main() {
 	__datafactory.randomizeDataset(0.8);
 
 	// Create network and Backpropagate data
-	int hiddenNeuronCnt1 = 100, hiddenNeuronCnt2 = 20;
-	__networkBig = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt1 }, 1, 3, 12.0);
-	__networkNarrow = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt1 }, 1, 3, 3.0);
-	__networkSmall = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt2 }, 1, 3, 12.0);
+	int hiddenNeuronCnt1 = 80, hiddenNeuronCnt2 = 10;
+
+	__testNetwork1 = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt1 }, 1, 3, 0.2);
+	__testNetwork2 = new SimpleFNN(21, new int[1]{ hiddenNeuronCnt2 }, 1, 3, 0.2);
 
 	// one epoch
-	double mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+	double mseTestNetwork1 = .0, mseTestNetwork2 = .0;
 	__datafactory.resetTestPtr();
 
 	for (int i = 0; i < __datafactory.testSize(); i++)
@@ -52,19 +59,20 @@ int main() {
 			break;
 		TrainData test = __datafactory.nextTest();
 
-		mseEpochBig += __networkBig->backward(&test);
-		mseEpochNarrow += __networkNarrow->backward(&test);
-		mseEpochSmall += __networkSmall->backward(&test);
+		mseTestNetwork1 += __testNetwork1->backward(&test);
+		mseTestNetwork2 += __testNetwork2->backward(&test);
 	}
-	printf_s("\t\t__networkBig(%d:%.1f)\t\t__networkNarrow(%d:%.1f)\t__networkNarrow(%d:%.1f)\n", hiddenNeuronCnt1, 12.0, hiddenNeuronCnt1, 3.0, hiddenNeuronCnt2, 12.0);
-	printf_s("BeginTest MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
+
+	string writeData = "epoch,mseTestNetwork1,mseTestNetwork2\n";
+	__writer.write(writeData, writeData.size());
+
+	cout << writeData;
 
 	// 50 epoch
-	for (int j = 0; j < 50; j++) {
+	for (int j = 0; j < 200; j++) {
 
-		printf_s("[Epoch %02d]\t__networkBig(%d:%.1f)\t\t__networkNarrow(%d:%.1f)\t__networkNarrow(%d:%.1f)\n", j, hiddenNeuronCnt1, 12.0, hiddenNeuronCnt1, 3.0, hiddenNeuronCnt2, 12.0);
 		// Train each
-		mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+		mseTestNetwork1 = .0, mseTestNetwork2 = .0;
 		__datafactory.resetTrainPtr();
 
 		for (int i = 0; i < __datafactory.trainSize(); i++)
@@ -73,14 +81,12 @@ int main() {
 				break;
 			TrainData train = __datafactory.nextTrain();
 
-			mseEpochBig += __networkBig->backward(&train);
-			mseEpochNarrow += __networkBig->backward(&train);
-			mseEpochSmall += __networkBig->backward(&train);
+			mseTestNetwork1 += __testNetwork1->backward(&train);
+			mseTestNetwork2 += __testNetwork1->backward(&train);
 		}
-		printf_s("Train MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
 
 		// Test each
-		mseEpochBig = .0, mseEpochNarrow = .0, mseEpochSmall = .0;
+		mseTestNetwork1 = .0, mseTestNetwork2 = .0;
 		__datafactory.resetTestPtr();
 
 		for (int i = 0; i < __datafactory.testSize(); i++)
@@ -89,10 +95,20 @@ int main() {
 				break;
 			TrainData test = __datafactory.nextTest();
 
-			mseEpochBig += __networkBig->backward(&test);
-			mseEpochNarrow += __networkNarrow->backward(&test);
-			mseEpochSmall += __networkSmall->backward(&test);
+			mseTestNetwork1 += __testNetwork1->backward(&test);
+			mseTestNetwork2 += __testNetwork2->backward(&test);
 		}
-		printf_s("Test MSE:\t%.8f\t\t\t%.8f\t\t\t%.8f\n\n", mseEpochBig, mseEpochNarrow, mseEpochSmall);
+
+		stringstream ss;
+		ss << j + 1 << "," << mseTestNetwork1 << "," << mseTestNetwork2 << "," << endl;
+
+		string writeStr = ss.str();
+		__writer.write(writeStr, writeStr.size());
+
+		cout << writeStr;
 	}
+
+	cout << "Wrote " << 200 << "Epochs into \"" << __outputFilename << "\"." << endl;
+
+	return 0;
 }

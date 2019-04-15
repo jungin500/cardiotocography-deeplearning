@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-double __learning_rate = 1.0;
+double __learning_rate;
 
 namespace Cardiotocography {
 
