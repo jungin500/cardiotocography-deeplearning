@@ -13,8 +13,6 @@
 	201513402 æ»¡§¿Œ (jungin500@kangwon.ac.kr)
 */
 
-double __learning_rate;
-
 namespace Cardiotocography {
 
 	using namespace std;
@@ -27,6 +25,7 @@ namespace Cardiotocography {
 		int _outputLayerDims;
 		vector<Matrix<double>*> _weightMatrixes;
 		vector<Matrix<double>*> _hiddenInstanceMatrixes;
+		double _learning_rate;
 
 #pragma region Static Mathmatical Functions
 		// Get backpropagation weight update value(delta)
@@ -68,11 +67,12 @@ namespace Cardiotocography {
 
 	public:
 		SimpleFNN(const int& input_layer, const int* hidden_layer,
-			const int& hidden_layer_size, const int& output_layer, const double& learning_rate)
+			const int& hidden_layer_size, const int& output_layer, const double learning_rate)
 			: _inputLayerDims(input_layer), _outputLayerDims(output_layer) {
 
 			// set as global variable
-			__learning_rate = learning_rate;
+			_learning_rate = learning_rate;
+			cout << "Learning rate: " << _learning_rate << endl;
 
 			_weightMatrixes.push_back(new Matrix<double>(_inputLayerDims, hidden_layer[0]));
 
@@ -134,7 +134,7 @@ namespace Cardiotocography {
 				for (int j = 0; j < 3; j++) {
 					double delta = getBPWeightUpdateDelta(i, j, error->at(0, j),
 						_weightMatrixes.at(1), hiddenInstanceMatrixZero, error); // last matrix is 100*3
-					updateBPWeight(i, j, delta, __learning_rate, _weightMatrixes.at(1));
+					updateBPWeight(i, j, delta, _learning_rate, _weightMatrixes.at(1));
 				}
 
 				double bpNodeVal = getBPNextNodeValue(i, _weightMatrixes.at(1), result);
