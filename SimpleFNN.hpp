@@ -7,12 +7,20 @@
 #include <iostream>
 #include <vector>
 
+/*
+	DataFactory & TrainData
+	Kangwon National University
+	201513402 æ»¡§¿Œ (jungin500@kangwon.ac.kr)
+*/
+
 double __learning_rate;
 
 namespace Cardiotocography {
 
 	using namespace std;
 
+	// SimpleFNN
+	// 
 	class SimpleFNN {
 	private:
 		int _inputLayerDims;
