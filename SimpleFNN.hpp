@@ -37,7 +37,8 @@ namespace Cardiotocography {
 		}
 
 		// Get next upstream node's value
-		static double getBPNextNodeValue(const int& upstreamIndex, Matrix<double>* weightMatrix, Matrix<double>* downstreamHidden) {
+		static double getBPNextNodeValue(const int& upstreamIndex,
+			Matrix<double>* weightMatrix, Matrix<double>* downstreamHidden) {
 			double nextNodeVal = .0;
 			int weightMatrixColumnCount = weightMatrix->size().cols;
 			for (int j = 0; j < weightMatrixColumnCount; j++) {
@@ -51,7 +52,8 @@ namespace Cardiotocography {
 		}
 
 		// Perform backpropagation weight update
-		static void updateBPWeight(const int& row, const int& col, const double& weight_update, const double& learning_rate, Matrix<double> * weightMatrix) {
+		static void updateBPWeight(const int& row, const int& col,
+			const double& weight_update, const double& learning_rate, Matrix<double> * weightMatrix) {
 			weightMatrix->set(row, col, weightMatrix->at(row, col) - learning_rate * weight_update);
 		}
 #pragma endregion
@@ -72,7 +74,7 @@ namespace Cardiotocography {
 			_weightMatrixes.push_back(new Matrix<double>(hidden_layer[hidden_layer_size - 1], _outputLayerDims));
 
 			print();
-			cout << "SimpleFNN Initialized..." << endl << endl;
+			std::cout << "SimpleFNN Initialized..." << endl << endl;
 		}
 
 		// test_data를 forward해서 Result를 반환한다.
@@ -122,7 +124,8 @@ namespace Cardiotocography {
 
 			for (int i = 0; i < _weightMatrixes.at(0)->size().cols; i++) {
 				for (int j = 0; j < 3; j++) {
-					double delta = getBPWeightUpdateDelta(i, j, error->at(0, j), _weightMatrixes.at(1), hiddenInstanceMatrixZero, error); // last matrix is 100*3
+					double delta = getBPWeightUpdateDelta(i, j, error->at(0, j),
+						_weightMatrixes.at(1), hiddenInstanceMatrixZero, error); // last matrix is 100*3
 					updateBPWeight(i, j, delta, __learning_rate, _weightMatrixes.at(1));
 				}
 
@@ -135,8 +138,8 @@ namespace Cardiotocography {
 
 		void print() {
 			for (int i = 0; i < _weightMatrixes.size(); i++)
-				cout << _weightMatrixes.at(i)->size().rows << "x" << _weightMatrixes.at(i)->size().cols << "\t";
-			cout << "Weight Matrix with Layer(" << _weightMatrixes.size() << ")" << endl;
+				std::cout << _weightMatrixes.at(i)->size().rows << "x" << _weightMatrixes.at(i)->size().cols << "\t";
+			std::cout << "Weight Matrix with Layer(" << _weightMatrixes.size() << ")" << endl;
 		}
 
 	};
